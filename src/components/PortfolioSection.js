@@ -120,7 +120,7 @@ export default function PortfolioSection() {
             ease: 'none',
             scrollTrigger: {
               trigger: sectionToPin,
-              start: 'top center',
+              start: 'top top',
               // Use correct pinning time - 1px scroll for 1px horizontal move
               end: () => `+=${scrollDistance}`, 
               pin: true,
