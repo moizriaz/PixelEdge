@@ -10,6 +10,8 @@ export default function Home() {
       <Banner />
       <LogosSection />
       <PortfolioSection />
+      <Banner />
+      <Banner />
     </main>
   );
 }

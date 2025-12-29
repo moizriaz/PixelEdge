@@ -14,6 +14,7 @@ export default function PortfolioSection() {
   const subtitleRef = useRef(null);
   const descriptionRef = useRef(null);
   const buttonRef = useRef(null);
+  const scrollTriggersRef = useRef([]);
 
   useEffect(() => {
     const sectionToPin = sectionToPinRef.current;
@@ -23,136 +24,139 @@ export default function PortfolioSection() {
     const descriptionElement = descriptionRef.current;
     const buttonElement = buttonRef.current;
 
-    if (sectionToPin && sectionPin) {
-      // Set initial position to 0 for carousel
-      const carousel = sectionPin.querySelector('.portfolio-carousel');
-      if (carousel) {
-        gsap.set(carousel, { x: 0 });
+    if (!sectionToPin || !sectionPin) return;
+
+    // Initialize function
+    const initAnimations = () => {
+      const scrollTriggers = [];
+
+      // Animate text content on initial load
+      const textTimeline = gsap.timeline({
+        scrollTrigger: {
+          trigger: sectionToPin,
+          start: 'top 80%',
+          toggleActions: 'play none none none',
+        },
+      });
+
+      scrollTriggers.push(textTimeline.scrollTrigger);
+
+      if (subtitleElement) {
+        textTimeline.fromTo(
+          subtitleElement,
+          { opacity: 0, y: 20 },
+          { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out' }
+        );
       }
 
-      // Wait for layout to be ready
-      const initScrollTrigger = () => {
-        const scrollTriggers = [];
+      if (titleElement) {
+        textTimeline.fromTo(
+          titleElement,
+          { opacity: 0, y: 30 },
+          { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out' },
+          '-=0.4'
+        );
+      }
 
-        // Animate text content on initial load
-        const textTimeline = gsap.timeline({
-          scrollTrigger: {
-            trigger: sectionToPin,
-            start: 'top 80%',
-            toggleActions: 'play none none none',
-          },
-        });
+      if (descriptionElement) {
+        textTimeline.fromTo(
+          descriptionElement,
+          { opacity: 0, y: 20 },
+          { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out' },
+          '-=0.4'
+        );
+      }
 
-        scrollTriggers.push(textTimeline.scrollTrigger);
+      if (buttonElement) {
+        textTimeline.fromTo(
+          buttonElement,
+          { opacity: 0, scale: 0.9 },
+          { opacity: 1, scale: 1, duration: 0.6, ease: 'back.out(1.7)' },
+          '-=0.3'
+        );
+      }
 
-        if (subtitleElement) {
-          textTimeline.fromTo(
-            subtitleElement,
-            { opacity: 0, y: 20 },
-            { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out' }
-          );
-        }
+      // Setup horizontal scroll carousel
+      const carousel = sectionPin.querySelector('.portfolio-carousel');
+      if (!carousel) return scrollTriggers;
 
-        if (titleElement) {
-          textTimeline.fromTo(
-            titleElement,
-            { opacity: 0, y: 30 },
-            { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out' },
-            '-=0.4'
-          );
-        }
+      // Set portfolio items to visible
+      const portfolioItems = carousel.querySelectorAll('.portfolio-item');
+      portfolioItems.forEach((item) => {
+        gsap.set(item, { opacity: 1, scale: 1 });
+      });
 
-        if (descriptionElement) {
-          textTimeline.fromTo(
-            descriptionElement,
-            { opacity: 0, y: 20 },
-            { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out' },
-            '-=0.4'
-          );
-        }
+      // CRITICAL: Reset carousel to start position (x: 0) - showing first items
+      gsap.set(carousel, { 
+        x: 0,
+        clearProps: 'transform'
+      });
 
-        if (buttonElement) {
-          textTimeline.fromTo(
-            buttonElement,
-            { opacity: 0, scale: 0.9 },
-            { opacity: 1, scale: 1, duration: 0.6, ease: 'back.out(1.7)' },
-            '-=0.3'
-          );
-        }
+      // Wait for next frame to ensure layout is calculated
+      requestAnimationFrame(() => {
+        // Force layout recalculation
+        ScrollTrigger.refresh();
 
-        // Calculate scroll distance properly
-        const carousel = sectionPin.querySelector('.portfolio-carousel');
-        if (!carousel) return;
+        // Calculate scroll distance
+        const carouselWidth = carousel.scrollWidth;
+        const viewportWidth = window.innerWidth;
+        const scrollDistance = Math.max(0, carouselWidth - viewportWidth);
 
-        // Ensure carousel starts at x: 0
+        // Ensure carousel is still at x: 0 before creating animation
         gsap.set(carousel, { x: 0 });
 
-        const scrollDistance = carousel.scrollWidth - window.innerWidth;
-
-        // Horizontal scroll with pinning - animate the carousel, not the wrapper
-        const containerAnimation = gsap.to(carousel, {
-          x: -scrollDistance,
-          ease: 'none',
-          scrollTrigger: {
-            trigger: sectionToPin,
-            start: 'top top',
-            end: () => `+=${scrollDistance}`,
-            pin: true,
-            scrub: 1, // Smoother scrub value
-            anticipatePin: 1,
-            invalidateOnRefresh: true,
-          },
-        });
-
-        scrollTriggers.push(containerAnimation.scrollTrigger);
-
-        // Animate portfolio items as they come into view
-        const portfolioItems = carousel.querySelectorAll('.portfolio-item');
-
-        portfolioItems.forEach((item) => {
-          const itemAnimation = gsap.fromTo(
-            item,
-            { opacity: 0, scale: 0.9 },
-            {
-              opacity: 1,
-              scale: 1,
-              duration: 0.6,
-              scrollTrigger: {
-                trigger: item,
-                start: 'left center',
-                end: 'right center',
-                containerAnimation: containerAnimation,
-                toggleActions: 'play none none none',
-              },
-            }
-          );
-          scrollTriggers.push(itemAnimation.scrollTrigger);
-        });
-
-        return scrollTriggers;
-      };
-
-      // Wait for next frame to ensure layout is ready
-      let scrollTriggers = [];
-      const timeoutId = setTimeout(() => {
-        scrollTriggers = initScrollTrigger() || [];
-        ScrollTrigger.refresh();
-      }, 100);
-
-      return () => {
-        clearTimeout(timeoutId);
-        // Cleanup ScrollTriggers created in this component
-        scrollTriggers.forEach((trigger) => {
-          if (trigger) trigger.kill();
-        });
-        // Also cleanup any remaining triggers for this section
-        ScrollTrigger.getAll().forEach((trigger) => {
-          if (trigger.vars && trigger.vars.trigger === sectionToPin) {
-            trigger.kill();
+        // Create horizontal scroll animation
+        const horizontalScroll = gsap.fromTo(
+          carousel,
+          { x: 0 }, // Start position - showing first items
+          {
+            x: -scrollDistance, // End position - showing last items
+            ease: 'none',
+            scrollTrigger: {
+              trigger: sectionToPin,
+              start: 'top center',
+              end: () => `+=${scrollDistance}`,
+              pin: true,
+              scrub: 1,
+              anticipatePin: 1,
+              invalidateOnRefresh: true,
+            },
           }
-        });
-      };
-    }
+        );
+
+        scrollTriggers.push(horizontalScroll.scrollTrigger);
+        scrollTriggersRef.current = scrollTriggers;
+      });
+
+      return scrollTriggers;
+    };
+
+    // Initialize with a small delay to ensure DOM is ready
+    const timeoutId = setTimeout(() => {
+      initAnimations();
+      ScrollTrigger.refresh();
+    }, 150);
+
+    // Cleanup function
+    return () => {
+      clearTimeout(timeoutId);
+      
+      // Kill all ScrollTriggers
+      scrollTriggersRef.current.forEach((trigger) => {
+        if (trigger && trigger.kill) {
+          trigger.kill();
+        }
+      });
+      
+      scrollTriggersRef.current = [];
+
+      // Cleanup any remaining triggers for this section
+      ScrollTrigger.getAll().forEach((trigger) => {
+        if (trigger.vars && trigger.vars.trigger === sectionToPin) {
+          trigger.kill();
+        }
+      });
+    };
   }, []);
 
   const portfolios = [
@@ -185,6 +189,48 @@ export default function PortfolioSection() {
       title: 'Creative Agency',
       description: 'Brand identity and design',
       category: 'Agency',
+    },
+    {
+      id: 6,
+      title: 'Fitness App',
+      description: 'Workout tracking and nutrition',
+      category: 'Health & Fitness',
+    },
+    {
+      id: 7,
+      title: 'Travel Booking',
+      description: 'Hotel and flight reservations',
+      category: 'Travel',
+    },
+    {
+      id: 8,
+      title: 'Food Delivery',
+      description: 'Restaurant ordering platform',
+      category: 'Food & Beverage',
+    },
+    {
+      id: 9,
+      title: 'Music Streaming',
+      description: 'Premium audio experience',
+      category: 'Entertainment',
+    },
+    {
+      id: 10,
+      title: 'Education Platform',
+      description: 'Online learning management',
+      category: 'Education',
+    },
+    {
+      id: 11,
+      title: 'Healthcare Portal',
+      description: 'Patient management system',
+      category: 'Healthcare',
+    },
+    {
+      id: 12,
+      title: 'Fashion E-commerce',
+      description: 'Trendy clothing marketplace',
+      category: 'Fashion',
     },
   ];
 
@@ -284,4 +330,3 @@ export default function PortfolioSection() {
     </section>
   );
 }
-

@@ -879,7 +879,8 @@ body {
 /* Portfolio Carousel */
 .portfolio-carousel-wrapper {
   margin-top: 80px;
-  overflow: visible;
+  overflow-x: hidden;
+  overflow-y: visible;
   position: relative;
   width: 100%;
 }
