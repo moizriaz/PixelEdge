@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import Image from 'next/image';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -93,40 +94,49 @@ export default function PortfolioSection() {
       });
 
       // Wait for next frame to ensure layout is calculated
-      requestAnimationFrame(() => {
+      const refreshScroll = () => {
         // Force layout recalculation
         ScrollTrigger.refresh();
 
-        // Calculate scroll distance
+        // Calculate scroll distance based on true scrollWidth
         const carouselWidth = carousel.scrollWidth;
         const viewportWidth = window.innerWidth;
+        // Use a multiplier to ensure we scroll enough if needed, 
+        // though strictly carouselWidth - viewportWidth is the geometric distance.
         const scrollDistance = Math.max(0, carouselWidth - viewportWidth);
 
         // Ensure carousel is still at x: 0 before creating animation
         gsap.set(carousel, { x: 0 });
 
+        // Kill existing scroll trigger for carousel if any (to be safe)
+        // Note: we're cleaning up on unmount, but ensuring we don't duplicate on re-init logic if called multiple times
+        
         // Create horizontal scroll animation
         const horizontalScroll = gsap.fromTo(
           carousel,
-          { x: 0 }, // Start position - showing first items
+          { x: 0 }, 
           {
-            x: -scrollDistance, // End position - showing last items
+            x: -scrollDistance,
             ease: 'none',
             scrollTrigger: {
               trigger: sectionToPin,
               start: 'top center',
-              end: () => `+=${scrollDistance}`,
+              // Use correct pinning time - 1px scroll for 1px horizontal move
+              end: () => `+=${scrollDistance}`, 
               pin: true,
               scrub: 1,
               anticipatePin: 1,
-              invalidateOnRefresh: true,
+              invalidateOnRefresh: true, 
+              // IMPORTANT: recalculate completion values on resize
             },
           }
         );
 
         scrollTriggers.push(horizontalScroll.scrollTrigger);
         scrollTriggersRef.current = scrollTriggers;
-      });
+      };
+
+      requestAnimationFrame(refreshScroll);
 
       return scrollTriggers;
     };
@@ -134,8 +144,7 @@ export default function PortfolioSection() {
     // Initialize with a small delay to ensure DOM is ready
     const timeoutId = setTimeout(() => {
       initAnimations();
-      ScrollTrigger.refresh();
-    }, 150);
+    }, 200);
 
     // Cleanup function
     return () => {
@@ -165,72 +174,84 @@ export default function PortfolioSection() {
       title: 'Real Estate Platform',
       description: 'Property search and listings',
       category: 'Real Estate',
+      image: '/images/portfolio/real-estate.png',
     },
     {
       id: 2,
       title: 'Luxury Interior Design',
       description: 'Dark mode luxury showcase',
       category: 'Interior Design',
+      image: '/images/portfolio/interior.png',
     },
     {
       id: 3,
-      title: 'Modern Living Spaces',
-      description: 'Contemporary design portfolio',
-      category: 'Lifestyle',
+      title: 'Fitness App',
+      description: 'Workout tracking and nutrition',
+      category: 'Health & Fitness',
+      image: '/images/portfolio/fitness.png',
     },
     {
       id: 4,
       title: 'E-commerce Platform',
       description: 'Online shopping experience',
       category: 'E-commerce',
+      image: '/images/portfolio/real-estate.png',
     },
     {
       id: 5,
       title: 'Creative Agency',
       description: 'Brand identity and design',
       category: 'Agency',
+      image: '/images/portfolio/interior.png',
     },
     {
       id: 6,
-      title: 'Fitness App',
-      description: 'Workout tracking and nutrition',
-      category: 'Health & Fitness',
+      title: 'Music Streaming',
+      description: 'Premium audio experience',
+      category: 'Entertainment',
+      image: '/images/portfolio/fitness.png',
     },
     {
       id: 7,
       title: 'Travel Booking',
       description: 'Hotel and flight reservations',
       category: 'Travel',
+      image: '/images/portfolio/real-estate.png',
     },
     {
       id: 8,
       title: 'Food Delivery',
       description: 'Restaurant ordering platform',
       category: 'Food & Beverage',
+      image: '/images/portfolio/interior.png',
     },
     {
       id: 9,
-      title: 'Music Streaming',
-      description: 'Premium audio experience',
-      category: 'Entertainment',
+      title: 'Modern Living Spaces',
+      description: 'Contemporary design portfolio',
+      category: 'Lifestyle',
+      image: '/images/portfolio/fitness.png',
     },
     {
       id: 10,
       title: 'Education Platform',
       description: 'Online learning management',
       category: 'Education',
+      image: '/images/portfolio/real-estate.png',
     },
     {
       id: 11,
       title: 'Healthcare Portal',
       description: 'Patient management system',
       category: 'Healthcare',
+      image: '/images/portfolio/interior.png',
     },
     {
       id: 12,
       title: 'Fashion E-commerce',
       description: 'Trendy clothing marketplace',
       category: 'Fashion',
+      image: '/images/portfolio/fitness.png',
     },
   ];
 
@@ -310,13 +331,21 @@ export default function PortfolioSection() {
       </div>
 
       <div id="section_pin" ref={sectionPinRef} className="portfolio-carousel-wrapper">
-        <div className="portfolio-carousel">
+        <div className="portfolio-carousel" style={{ display: 'flex', flexWrap: 'nowrap', width: 'fit-content' }}>
           {portfolios.map((portfolio) => (
             <div key={portfolio.id} className="portfolio-item">
               <div className="portfolio-image-wrapper">
-                <div className="portfolio-image-placeholder">
-                  <span className="portfolio-category">{portfolio.category}</span>
-                  <span className="portfolio-name">{portfolio.title}</span>
+                <Image
+                  src={portfolio.image}
+                  alt={portfolio.title}
+                  fill
+                  style={{ objectFit: 'cover' }}
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  className="portfolio-image"
+                  onLoadingComplete={() => ScrollTrigger.refresh()}
+                />
+                <div className="portfolio-overlay">
+                   {/* Optional: Add overlay content if needed, currently reusing styles for hover effect or remove placeholder */}
                 </div>
               </div>
               <div className="portfolio-info">
