@@ -119,9 +119,8 @@ export default function ExtendedPortfolio() {
               trigger: section,
               start: 'top center',
               end: () => `+=${scrollDistance}`,
-              pin: true,
+              pin: false,
               scrub: 1,
-              anticipatePin: 1,
               invalidateOnRefresh: true,
             },
           }
