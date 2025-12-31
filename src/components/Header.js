@@ -6,6 +6,7 @@ import { gsap } from 'gsap';
 export default function Header() {
   const headerRef = useRef(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const menuRef = useRef(null);
   const navLinksRef = useRef([]);
 
@@ -17,6 +18,16 @@ export default function Header() {
         { opacity: 1, y: 0, duration: 0.8, ease: "power2.out" }
       );
     }
+  }, []);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY;
+      setIsScrolled(scrollPosition > 50);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   useEffect(() => {
@@ -67,7 +78,7 @@ export default function Header() {
   };
 
   return (
-    <header ref={headerRef} className="header-container">
+    <header ref={headerRef} className={`header-container ${isScrolled ? 'scrolled' : ''}`}>
       <div className="container">
         <nav className="navbar navbar-expand-lg">
           <div className="container-fluid">

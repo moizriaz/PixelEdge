@@ -204,48 +204,48 @@ export default function PortfolioSection() {
       category: 'Agency',
       image: '/images/portfolio/interior.png',
     },
-    {
-      id: 6,
-      title: 'Music Streaming',
-      description: 'Premium audio experience',
-      category: 'Entertainment',
-      image: '/images/portfolio/fitness.png',
-    },
-    {
-      id: 7,
-      title: 'Travel Booking',
-      description: 'Hotel and flight reservations',
-      category: 'Travel',
-      image: '/images/portfolio/real-estate.png',
-    },
-    {
-      id: 8,
-      title: 'Food Delivery',
-      description: 'Restaurant ordering platform',
-      category: 'Food & Beverage',
-      image: '/images/portfolio/interior.png',
-    },
-    {
-      id: 9,
-      title: 'Modern Living Spaces',
-      description: 'Contemporary design portfolio',
-      category: 'Lifestyle',
-      image: '/images/portfolio/fitness.png',
-    },
-    {
-      id: 10,
-      title: 'Education Platform',
-      description: 'Online learning management',
-      category: 'Education',
-      image: '/images/portfolio/real-estate.png',
-    },
-    {
-      id: 11,
-      title: 'Healthcare Portal',
-      description: 'Patient management system',
-      category: 'Healthcare',
-      image: '/images/portfolio/interior.png',
-    },
+    // {
+    //   id: 6,
+    //   title: 'Music Streaming',
+    //   description: 'Premium audio experience',
+    //   category: 'Entertainment',
+    //   image: '/images/portfolio/fitness.png',
+    // },
+    // {
+    //   id: 7,
+    //   title: 'Travel Booking',
+    //   description: 'Hotel and flight reservations',
+    //   category: 'Travel',
+    //   image: '/images/portfolio/real-estate.png',
+    // },
+    // {
+    //   id: 8,
+    //   title: 'Food Delivery',
+    //   description: 'Restaurant ordering platform',
+    //   category: 'Food & Beverage',
+    //   image: '/images/portfolio/interior.png',
+    // },
+    // {
+    //   id: 9,
+    //   title: 'Modern Living Spaces',
+    //   description: 'Contemporary design portfolio',
+    //   category: 'Lifestyle',
+    //   image: '/images/portfolio/fitness.png',
+    // },
+    // {
+    //   id: 10,
+    //   title: 'Education Platform',
+    //   description: 'Online learning management',
+    //   category: 'Education',
+    //   image: '/images/portfolio/real-estate.png',
+    // },
+    // {
+    //   id: 11,
+    //   title: 'Healthcare Portal',
+    //   description: 'Patient management system',
+    //   category: 'Healthcare',
+    //   image: '/images/portfolio/interior.png',
+    // },
     {
       id: 12,
       title: 'Fashion E-commerce',
@@ -359,3 +359,4 @@ export default function PortfolioSection() {
     </section>
   );
 }
+
